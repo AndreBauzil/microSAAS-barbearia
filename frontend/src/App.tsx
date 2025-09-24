@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ServiceCard } from './components/ServiceCard';
-import { SchedulingDialog } from './components/SchedulingDialog';
+import { AppointmentDialog } from './components/AppointmentDialog';
 
 interface IService {
   id: string;
@@ -26,6 +26,10 @@ function App() {
         console.error("Houve um erro ao buscar os serviços:", error);
       });
   }, []);
+
+  const refreshServices = () => {
+    
+  }
 
   // Função ServiceCard
   const handleScheduleClick = (service: IService) => {
@@ -54,10 +58,11 @@ function App() {
         </div>
       </main>
 
-      <SchedulingDialog 
+      <AppointmentDialog 
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         service={selectedService}
+        onSuccess={refreshServices} 
       />
     </div>
   )
