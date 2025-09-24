@@ -67,4 +67,14 @@ export class AppointmentController {
       return res.status(500).json({ error: 'Something went wrong' });
     }
   }
+
+  async findUpcoming(req: Request, res: Response) {
+    try {
+        const appointments = await appointmentServices.findUpcoming();
+        return res.json(appointments);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Something went wrong' });
+    }
+}
 }

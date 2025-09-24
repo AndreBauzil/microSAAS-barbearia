@@ -7,7 +7,6 @@ interface ICreateAppointmentData {
   date: Date;
   serviceId: string;
 }
-
 interface IUpdateAppointmentData {
     customerName?: string;
     date?: Date;
@@ -65,5 +64,28 @@ export class AppointmentServices {
           where: { id },
         });
         return; 
+    }
+
+    async findUpcoming() {
+        const today = startOfDay(new Date()); 
+
+        const appointments = await prisma.appointment.findMany({
+            where: {
+                date: {
+                    gte: today, 
+                },
+            },
+            include: { 
+                service: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+            orderBy: {
+                date: 'asc', // Ordena pelo mais próximo
+            },
+        });
+        return appointments;
     }
 }

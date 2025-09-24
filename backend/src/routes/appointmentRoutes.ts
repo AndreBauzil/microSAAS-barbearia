@@ -5,8 +5,9 @@ import { AppointmentController } from '../controllers/appointmentController';
 const appointmentRoutes = Router();
 const appointmentController = new AppointmentController();
 
+appointmentRoutes.get('/upcoming', appointmentController.findUpcoming);
+appointmentRoutes.get('/', appointmentController.findByDay);
 appointmentRoutes.post('/', appointmentController.create);
-appointmentRoutes.get('/', appointmentController.findByDay); 
 appointmentRoutes.put('/:id', appointmentController.update);
 appointmentRoutes.delete('/:id', appointmentController.delete);
 
