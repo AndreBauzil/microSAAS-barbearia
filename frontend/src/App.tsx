@@ -1,8 +1,8 @@
 // frontend/src/App.tsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
-import { ServiceCard } from './components/ServiceCard'; 
+import { ServiceCard } from './components/ServiceCard';
+import { SchedulingDialog } from './components/SchedulingDialog';
 
 interface IService {
   id: string;
@@ -13,6 +13,9 @@ interface IService {
 
 function App() {
   const [services, setServices] = useState<IService[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // Serviço selecionado para agendar
+  const [selectedService, setSelectedService] = useState<IService | null>(null);
 
   useEffect(() => {
     axios.get('http://localhost:3333/services')
@@ -23,6 +26,12 @@ function App() {
         console.error("Houve um erro ao buscar os serviços:", error);
       });
   }, []);
+
+  // Função ServiceCard
+  const handleScheduleClick = (service: IService) => {
+    setSelectedService(service);
+    setIsDialogOpen(true);
+  };
 
   return (
     <div className="bg-background min-h-screen">
@@ -35,10 +44,21 @@ function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map(service => (
-            <ServiceCard key={service.id} service={service} />
+            <ServiceCard 
+              key={service.id} 
+              service={service} 
+
+              onScheduleClick={() => handleScheduleClick(service)} 
+            />
           ))}
         </div>
       </main>
+
+      <SchedulingDialog 
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        service={selectedService}
+      />
     </div>
   )
 }

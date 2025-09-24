@@ -2,16 +2,18 @@
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 
-// A interface para definir quais "props" nosso componente aceita
-interface ServiceCardProps {
-  service: {
-    name: string;
-    price: number;
-    duration: number;
-  }
+interface IService {
+  name: string;
+  price: number;
+  duration: number;
 }
 
-export function ServiceCard({ service }: ServiceCardProps) {
+interface ServiceCardProps {
+  service: IService;
+  onScheduleClick: (service: IService) => void; 
+}
+
+export function ServiceCard({ service, onScheduleClick }: ServiceCardProps) {
   return (
     <Card>
       <CardHeader>
@@ -24,7 +26,9 @@ export function ServiceCard({ service }: ServiceCardProps) {
         </p>
       </CardContent>
       <CardFooter>
-        <Button className="w-full">Agendar</Button>
+        <Button className="w-full" onClick={() => onScheduleClick(service)}>
+          Agendar
+        </Button>
       </CardFooter>
     </Card>
   )
