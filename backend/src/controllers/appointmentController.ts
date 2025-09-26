@@ -1,6 +1,7 @@
 // backend/src/controllers/appointmentController.ts
 import { Request, Response } from 'express';
 import { AppointmentServices } from '../services/appointmentServices';
+import { AppointmentStatus } from "@prisma/client"; 
 
 const appointmentServices = new AppointmentServices();
 
@@ -46,17 +47,18 @@ export class AppointmentController {
   
   async update(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const { customerName, date } = req.body;
-      const appointment = await appointmentServices.update(id, {
-        customerName,
-        date: date ? new Date(date) : undefined,
-      });
-      return res.json(appointment);
+        const { id } = req.params;
+        const { customerName, date, status } = req.body; 
+        const appointment = await appointmentServices.update(id, {
+            customerName,
+            date: date ? new Date(date) : undefined,
+            status,
+        });
+        return res.json(appointment);
     } catch (error) {
-      return res.status(500).json({ error: 'Something went wrong' });
+        return res.status(500).json({ error: 'Something went wrong' });
     }
-  }
+}
 
   async delete(req: Request, res: Response) {
     try {
@@ -76,5 +78,21 @@ export class AppointmentController {
         console.error(error);
         return res.status(500).json({ error: 'Something went wrong' });
     }
-}
+  }
+
+  async updateStatus(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!status || !Object.values(AppointmentStatus).includes(status)) {
+        return res.status(400).json({ error: 'Invalid status provided' });
+      }
+
+      const appointment = await appointmentServices.updateStatus(id, status);
+      return res.json(appointment);
+    } catch (error) {
+      return res.status(500).json({ error: 'Something went wrong' });
+    }
+  }
 }

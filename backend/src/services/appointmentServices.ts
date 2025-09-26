@@ -1,5 +1,6 @@
 // backend/src/services/appointmentServices.ts
 import { prisma } from "../lib/prisma";
+import { AppointmentStatus } from "@prisma/client"; 
 import { startOfDay, endOfDay } from 'date-fns'; 
 
 interface ICreateAppointmentData {
@@ -8,8 +9,9 @@ interface ICreateAppointmentData {
   serviceId: string;
 }
 interface IUpdateAppointmentData {
-    customerName?: string;
-    date?: Date;
+  customerName?: string;
+  date?: Date;
+  status?: AppointmentStatus;
 }
 
 export class AppointmentServices {
@@ -52,13 +54,13 @@ export class AppointmentServices {
     }
 
     async update(id: string, data: IUpdateAppointmentData) {
-        const appointment = await prisma.appointment.update({
+      const appointment = await prisma.appointment.update({
           where: { id },
           data,
-        });
-        return appointment;
-    }
-    
+      });
+      return appointment;
+  }
+  
     async delete(id: string) {
         await prisma.appointment.delete({
           where: { id },
@@ -67,13 +69,14 @@ export class AppointmentServices {
     }
 
     async findUpcoming() {
-        const today = startOfDay(new Date()); 
+      const today = startOfDay(new Date());
 
-        const appointments = await prisma.appointment.findMany({
-            where: {
-                date: {
-                    gte: today, 
-                },
+      const appointments = await prisma.appointment.findMany({
+          where: {
+              date: {
+                  gte: today,
+              },
+              status: 'SCHEDULED' 
             },
             include: { 
                 service: {
@@ -88,4 +91,12 @@ export class AppointmentServices {
         });
         return appointments;
     }
+
+    async updateStatus(id: string, status: AppointmentStatus) {
+      const appointment = await prisma.appointment.update({
+          where: { id },
+          data: { status },
+      });
+      return appointment;
+  }
 }

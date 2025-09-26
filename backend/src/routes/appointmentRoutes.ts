@@ -7,8 +7,13 @@ const appointmentController = new AppointmentController();
 
 appointmentRoutes.get('/upcoming', appointmentController.findUpcoming);
 appointmentRoutes.get('/', appointmentController.findByDay);
+
 appointmentRoutes.post('/', appointmentController.create);
+
 appointmentRoutes.put('/:id', appointmentController.update);
+
 appointmentRoutes.delete('/:id', appointmentController.delete);
+
+appointmentRoutes.patch('/:id/status', appointmentController.updateStatus);
 
 export { appointmentRoutes };
