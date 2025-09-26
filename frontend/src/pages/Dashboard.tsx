@@ -1,5 +1,6 @@
 // frontend/src/pages/Dashboard.tsx
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // <-- Importe o Link
 import axios from 'axios';
 
 import { Calendar } from '@/components/ui/calendar';
@@ -8,6 +9,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge"; 
+import { Toaster } from '@/components/ui/toaster';
+import { useToast } from "@/hooks/use-toast";
 
 import { AppointmentDialog } from "@/components/AppointmentDialog"; 
 import { WeeklyRevenueChart } from "@/components/WeeklyRevenueChart";
@@ -40,6 +43,8 @@ export function Dashboard() {
 
   const [upcomingAppointments, setUpcomingAppointments] = useState<IAppointment[]>([]);
 
+  const { toast } = useToast()
+
   const fetchAppointments = () => {
     if (!selectedDate) return;
     setIsLoading(true);
@@ -65,15 +70,19 @@ export function Dashboard() {
       });
 
       setAppointments(prev => prev.map(app => 
-          app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
+        app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
       ));
       setUpcomingAppointments(prev => prev.map(app => 
-          app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
+        app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
       ));
 
     } catch (error) {
       console.error("Erro ao cancelar agendamento:", error);
-      alert("Não foi possível cancelar o agendamento.");
+      toast({
+        title: "Erro no Servidor",
+        description: "Houve um erro ao salvar o agendamento. Tente novamente.",
+        variant: "destructive",
+      })
     } finally {
       setIsAlertDialogOpen(false);
       setAppointmentToDelete(null);
@@ -119,7 +128,12 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <header className="p-4 border-b">
-        <h1 className="text-2xl font-bold">Dashboard do Barbeiro</h1>
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Dashboard do Barbeiro</h1>
+          <Button asChild variant="outline">
+            <Link to="/">Ver Página Inicial</Link>
+          </Button>
+        </div>
       </header>
 
       <main className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -267,6 +281,7 @@ export function Dashboard() {
           </AlertDialogContent>
       </AlertDialog>
 
+      <Toaster />
     </div> 
   );
 }
