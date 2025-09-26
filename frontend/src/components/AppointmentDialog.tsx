@@ -5,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
@@ -35,6 +36,8 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
   const [customerName, setCustomerName] = useState("");
   const [dailyAppointments, setDailyAppointments] = useState<{ date: string }[]>([]);
   const [status, setStatus] = useState<'SCHEDULED' | 'COMPLETED' | 'CANCELED'>('SCHEDULED');
+
+  const { toast } = useToast()
 
   const isEditMode = !!initialData;
 
@@ -78,8 +81,13 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
   }, [dailyAppointments]);
 
   const handleSubmit = async () => {
-    if (!selectedDate || !selectedTime || !customerName) {
-      alert("Por favor, preencha todos os campos.");
+      if (!selectedDate || !selectedTime || !customerName) {
+        // Substitua o alert()
+        toast({
+        title: "Erro de Validação",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive",
+        })
       return;
     }
 
@@ -98,18 +106,26 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
       if (isEditMode) {
         // MODO EDIÇÃO: PUT
         await axios.put(`http://localhost:3333/appointments/${initialData.id}`, appointmentData);
-        alert(`Agendamento atualizado com sucesso!`);
+        toast({
+          title: "Sucesso!",
+          description: "O agendamento foi atualizado com sucesso.",
+        })
       } else {
         // MODO CRIAÇÃO: POST
         await axios.post('http://localhost:3333/appointments', appointmentData);
-        alert(`Agendamento para "${service?.name}" realizado com sucesso!`);
+        toast({
+          title: "Sucesso!",
+          description: `Agendamento para "${service?.name}" realizado com sucesso.`,
+        })
       }
-      onSuccess(); 
-      onOpenChange(false); 
-
+      onSuccess();
+      onOpenChange(false);
     } catch (error) {
-      console.error("Erro ao salvar agendamento:", error);
-      alert("Houve um erro ao salvar o agendamento. Tente novamente.");
+      toast({
+        title: "Erro no Servidor",
+        description: "Houve um erro ao salvar o agendamento. Tente novamente.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -154,7 +170,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
               <div className="grid grid-cols-4 gap-2">
                   {businessHours.map(time => (
                       <Button key={time} variant={selectedTime === time ? "default" : "outline"} onClick={() => setSelectedTime(time)}>
-                          {time}
+                        {time}
                       </Button>
                   ))}
               </div>
