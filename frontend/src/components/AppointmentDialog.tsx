@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 
@@ -14,6 +16,7 @@ interface InitialData {
   id: string;
   customerName: string;
   date: string;
+  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELED';
 }
 
 interface AppointmentDialogProps {
@@ -31,6 +34,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [dailyAppointments, setDailyAppointments] = useState<{ date: string }[]>([]);
+  const [status, setStatus] = useState<'SCHEDULED' | 'COMPLETED' | 'CANCELED'>('SCHEDULED');
 
   const isEditMode = !!initialData;
 
@@ -40,6 +44,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
       const initialDate = new Date(initialData.date);
       setSelectedDate(initialDate);
       setSelectedTime(format(initialDate, 'HH:mm'));
+      setStatus(initialData.status); 
     } else {
       setCustomerName("");
       setSelectedDate(new Date());
@@ -86,6 +91,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
       customerName,
       date: appointmentDate.toISOString(),
       serviceId: service?.id,
+      status,
     };
 
     try {
@@ -119,9 +125,26 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
 
         <div className="space-y-4 py-4">
           <div>
-              <Label htmlFor="customerName">Seu Nome</Label>
-              <Input id="customerName" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+            <Label htmlFor="customerName">Seu Nome</Label>
+            <Input id="customerName" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
           </div>
+
+          {isEditMode && (
+            <div>
+              <Label>Status</Label>
+              <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SCHEDULED">Agendado</SelectItem>
+                  <SelectItem value="COMPLETED">Concluído</SelectItem>
+                  <SelectItem value="CANCELED">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
           <div>
               <Label>Data</Label>
               <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md border" disabled={(date) => date < startOfDay(new Date())}/>

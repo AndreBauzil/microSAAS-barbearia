@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"; 
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge"; 
 
 import { AppointmentDialog } from "@/components/AppointmentDialog"; 
 import { WeeklyRevenueChart } from "@/components/WeeklyRevenueChart";
@@ -19,7 +20,8 @@ interface IAppointment {
   id: string;
   customerName: string;
   date: string;
-  serviceId: string; 
+  serviceId: string;
+  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELED'; 
   service: {
     name: string;
   };
@@ -58,23 +60,47 @@ export function Dashboard() {
     if (!appointmentToDelete) return;
 
     try {
-        await axios.delete(`http://localhost:3333/appointments/${appointmentToDelete.id}`);
+      await axios.patch(`http://localhost:3333/appointments/${appointmentToDelete.id}/status`, {
+        status: 'CANCELED'
+      });
 
-        // Atualiza a lista de agendamentos para refletir a exclusão
-        setAppointments(prev => prev.filter(app => app.id !== appointmentToDelete.id));
+      setAppointments(prev => prev.map(app => 
+          app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
+      ));
+      setUpcomingAppointments(prev => prev.map(app => 
+          app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
+      ));
 
     } catch (error) {
-        console.error("Erro ao cancelar agendamento:", error);
-        alert("Não foi possível cancelar o agendamento.");
+      console.error("Erro ao cancelar agendamento:", error);
+      alert("Não foi possível cancelar o agendamento.");
     } finally {
-        setIsAlertDialogOpen(false);
-        setAppointmentToDelete(null);
+      setIsAlertDialogOpen(false);
+      setAppointmentToDelete(null);
     }
   };
   const handleEditClick = (appointment: IAppointment) => {
     setAppointmentToEdit(appointment);
     setIsEditDialogOpen(true);
   };
+  const handleMarkAsCompleted = async (appointmentId: string) => {
+    try {
+      const response = await axios.patch(`http://localhost:3333/appointments/${appointmentId}/status`, {
+        status: 'COMPLETED'
+      });
+
+      setAppointments(prev => prev.map(app => 
+        app.id === appointmentId ? { ...app, status: 'COMPLETED' } : app
+      ));
+      setUpcomingAppointments(prev => prev.map(app => 
+        app.id === appointmentId ? { ...app, status: 'COMPLETED' } : app
+      ));
+
+    } catch (error) {
+      console.error("Erro ao marcar como concluído:", error);
+      alert("Não foi possível atualizar o agendamento.");
+    }
+};
 
   useEffect(() => {
     fetchAppointments();
@@ -133,7 +159,7 @@ export function Dashboard() {
         </div>
 
         <div className="col-span-1 lg:col-span-2 flex flex-col gap-8">
-            <WeeklyRevenueChart />
+          <WeeklyRevenueChart />
 
           <div>
             <h2 className="font-bold mb-4 text-lg">
@@ -143,12 +169,13 @@ export function Dashboard() {
             <div className="border rounded-lg p-2">
               <Table>
                 <TableHeader>
-                    <TableRow>
+                  <TableRow>
                     <TableHead>Cliente</TableHead>
                     <TableHead>Serviço</TableHead>
                     <TableHead>Horário</TableHead>
-                    <TableHead className="text-right">Ações</TableHead> 
-                    </TableRow>
+                    <TableHead>Status</TableHead> 
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
                 </TableHeader>
                 <TableBody>
                     {isLoading ? (
@@ -157,31 +184,47 @@ export function Dashboard() {
                       </TableRow>
                     ) : appointments.length > 0 ? (
                         appointments.map((appointment) => (
-                            <TableRow key={appointment.id}>
+                          <TableRow key={appointment.id}>
                             <TableCell className="font-medium">{appointment.customerName}</TableCell>
-                            <TableCell>{appointment.service?.name || 'Serviço não encontrado'}</TableCell>
+                            <TableCell>{appointment.service?.name || 'N/A'}</TableCell>
                             <TableCell>{format(new Date(appointment.date), 'HH:mm')}</TableCell>
-                            <TableCell className="text-right"> {/* Célula das Ações */}
-                                <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Abrir menu</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => handleEditClick(appointment)}>
-                                      Editar
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => handleCancelClick(appointment)} 
-                                        className="text-red-600 focus:bg-red-100 focus:text-red-700"
-                                    >
-                                        Cancelar
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                                </DropdownMenu>
+                            <TableCell> {/* Célula do Status */}
+                              {appointment.status === 'SCHEDULED' && (
+                                <Badge variant="secondary">Agendado</Badge>
+                              )}
+                              {appointment.status === 'COMPLETED' && (
+                                <Badge className="bg-green-600 text-white">Concluído</Badge>
+                              )}
+                              {appointment.status === 'CANCELED' && (
+                                <Badge variant="destructive">Cancelado</Badge>
+                              )}
                             </TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Abrir menu</span>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {appointment.status === 'SCHEDULED' && (
+                                  <DropdownMenuItem onClick={() => handleMarkAsCompleted(appointment.id)}>
+                                    Marcar como Concluído
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={() => handleEditClick(appointment)}>
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleCancelClick(appointment)}
+                                  className="text-red-600 focus:bg-red-100 focus:text-red-700"
+                                >
+                                  Cancelar
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
                         </TableRow>
                       ))
                     ) : (
