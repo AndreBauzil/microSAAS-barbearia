@@ -1,40 +1,57 @@
 # Barbearia do Dev - Sistema de Agendamento
 
-Este projeto é um Micro-SaaS (Software as a Service) completo para gestão de agendamentos em barbearias, construído com um stack de tecnologias modernas e foco em boas práticas de desenvolvimento.
+**Status do Projeto: Concluído**
 
-## Visão Geral do Projeto
+Este projeto é um Micro-SaaS (Software as a Service) full-stack para gestão de agendamentos em barbearias, construído com tecnologias modernas e foco em criar uma experiência de produto realista e profissional.
 
-A aplicação permite que clientes visualizem os serviços oferecidos e agendem horários de forma intuitiva, enquanto fornece aos administradores (barbeiros) um dashboard para visualizar e gerenciar todos os agendamentos do dia.
+### Screenshots
 
-## Tecnologias Utilizadas
+| Página Inicial (Cliente) | Dashboard (Administrador) |
+| :---: | :---: |
+| ![Página Inicial](./assets/pagina-inicial.png) | ![Dashboard](./assets/dashboard.png) |
 
-Este projeto é um monorepo dividido em duas partes principais: `backend` e `frontend`.
+---
 
-### **Backend**
-* **Runtime:** Node.js
-* **Framework:** Express.js
-* **Linguagem:** TypeScript
-* **Banco de Dados:** PostgreSQL (em Docker)
-* **ORM:** Prisma (para interação segura e tipada com o banco de dados)
-* **Gerenciador de Pacotes:** NPM
+### Destaques para Recrutadores
 
-### **Frontend**
-* **Framework:** React
-* **Linguagem:** TypeScript
-* **Build Tool:** Vite
-* **Estilização:** Tailwind CSS (v3.0)
-* **Biblioteca de Componentes:** Shadcn/ui
-* **Roteamento:** React Router DOM
-* **Cliente HTTP:** Axios
+Este projeto foi desenvolvido não apenas para ser funcional, mas para demonstrar competências técnicas e de produto em diversas áreas:
 
-## Funcionalidades Implementadas
+* **Arquitetura Full-Stack e Monorepo:** O código é organizado com backend e frontend desacoplados, uma prática comum em times de desenvolvimento modernos.
+* **API RESTful Robusta:** O backend em Node.js/Express segue os princípios REST, com endpoints bem definidos para operações CRUD completas (Create, Read, Update, Delete) e lógica de negócio desacoplada em camadas (Rotas, Controladores, Serviços).
+* **Gestão de Banco de Dados com ORM:** Utilização do **Prisma** para gerenciar o schema do banco de dados PostgreSQL, incluindo migrations para controle de versão e queries tipadas para garantir a segurança dos dados.
+* **Frontend Moderno e Reativo:** Construído com **React** e **Vite** para uma experiência de desenvolvimento rápida e um resultado performático. Todo o código utiliza **TypeScript** para maior robustez.
+* **UI/UX Profissional:** A interface foi construída com **Tailwind CSS** e **Shadcn/ui**, demonstrando habilidade com ferramentas de design system modernas para criar interfaces limpas, responsivas e reutilizáveis.
+* **Componentização e Reusabilidade:** Componentes como o `AppointmentDialog` foram refatorados para serem utilizados tanto na criação quanto na edição de agendamentos, seguindo o princípio DRY (Don't Repeat Yourself).
+* **Lógica de Negócio e Analytics:** O sistema vai além do CRUD básico, implementando regras de negócio como a verificação de horários disponíveis e a agregação de dados para analytics (gráfico de faturamento semanal).
 
-* **Listagem de Serviços:** A página inicial exibe os serviços oferecidos, buscando os dados dinamicamente da API.
-* **Agendamento de Horários:** Clientes podem selecionar um serviço, escolher uma data e um horário disponível para agendar.
-* **Dashboard Administrativo:** Uma página protegida (`/dashboard`) para o barbeiro visualizar todos os agendamentos de um dia específico em uma tabela organizada.
-* **CRUD Completo de Agendamentos:** A API suporta a criação, leitura, atualização e exclusão de agendamentos.
+---
 
-## Como Executar o Projeto Localmente
+### Tecnologias Utilizadas
+
+#### **Backend**
+* **Node.js** (Ambiente de execução)
+* **TypeScript** (`v5.9.2`)
+* **Express.js** (`v5.1.0`)
+* **Prisma** (ORM) (`v6.16.2`)
+* **PostgreSQL** (Banco de Dados, via Docker)
+* **ts-node-dev** (`v2.0.0`)
+* **date-fns** (`v4.1.0`)
+
+#### **Frontend**
+* **React** (`v19.1.1`)
+* **Vite** (`v7.1.7`)
+* **TypeScript** (`~v5.8.3`)
+* **Tailwind CSS** (`v3.4.17`)
+* **Shadcn/ui** (Biblioteca de Componentes)
+* **React Router DOM** (`v7.9.2`)
+* **Recharts** (`v3.2.1`)
+* **Axios** (`v1.12.2`)
+* **date-fns** (`v4.1.0`)
+* **Lucide React** (Ícones) (`v0.544.0`)
+
+---
+
+### Como Executar o Projeto Localmente
 
 Siga os passos abaixo para configurar e rodar a aplicação na sua máquina.
 
