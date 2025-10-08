@@ -94,10 +94,6 @@ export function Dashboard() {
   };
   const handleMarkAsCompleted = async (appointmentId: string) => {
     try {
-      const response = await axios.patch(`http://localhost:3333/appointments/${appointmentId}/status`, {
-        status: 'COMPLETED'
-      });
-
       setAppointments(prev => prev.map(app => 
         app.id === appointmentId ? { ...app, status: 'COMPLETED' } : app
       ));

@@ -1,5 +1,5 @@
 // frontend/src/components/AppointmentDialog.tsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -34,7 +34,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState("");
-  const [dailyAppointments, setDailyAppointments] = useState<{ date: string }[]>([]);
+  const [_dailyAppointments, setDailyAppointments] = useState<{ date: string }[]>([]);
   const [status, setStatus] = useState<'SCHEDULED' | 'COMPLETED' | 'CANCELED'>('SCHEDULED');
 
   const { toast } = useToast()
@@ -71,14 +71,6 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
       });
 
   }, [selectedDate]);
-
-  const availableTimeSlots = useMemo(() => {
-    const bookedTimes = dailyAppointments.map(appointment => 
-      format(new Date(appointment.date), 'HH:mm')
-    );
-    
-    return businessHours.filter(time => !bookedTimes.includes(time));
-  }, [dailyAppointments]);
 
   const handleSubmit = async () => {
       if (!selectedDate || !selectedTime || !customerName) {
