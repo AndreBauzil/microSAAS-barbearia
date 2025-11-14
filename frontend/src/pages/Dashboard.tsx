@@ -1,7 +1,6 @@
 // frontend/src/pages/Dashboard.tsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // <-- Importe o Link
-import axios from 'axios';
+import { Link } from 'react-router-dom'; 
 
 import { api } from "@/lib/api"
 
