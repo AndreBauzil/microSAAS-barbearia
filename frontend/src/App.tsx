@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; 
 import axios from 'axios';
 
+import { api } from './lib/api'
+
 import { Button } from './components/ui/button'; 
 import { Toaster } from "@/components/ui/toaster"
 import { ServiceCard } from './components/ServiceCard';
@@ -20,7 +22,7 @@ function App() {
   const [selectedService, setSelectedService] = useState<IService | null>(null);
 
   useEffect(() => {
-    axios.get('http://localhost:3333/services')
+    api.get('/services') 
       .then(response => {
         setServices(response.data);
       })

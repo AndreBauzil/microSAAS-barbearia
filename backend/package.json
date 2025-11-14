@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules --respawn src/server.ts",
     "seed": "ts-node prisma/seed.ts",
-    "build": "prisma migrate deploy && prisma generate && tsc",
+    "build": "prisma migrate deploy && prisma generate && tsc && npm run seed",
     "start": "node dist/server.js"
   },
   "keywords": [],

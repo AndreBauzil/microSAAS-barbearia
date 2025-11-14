@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // <-- Importe o Link
 import axios from 'axios';
 
+import { api } from "@/lib/api"
+
 import { Calendar } from '@/components/ui/calendar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"; 
@@ -49,7 +51,7 @@ export function Dashboard() {
     if (!selectedDate) return;
     setIsLoading(true);
     const dateString = format(selectedDate, 'yyyy-MM-dd');
-    axios.get(`http://localhost:3333/appointments?date=${dateString}`)
+    api.get(`/appointments?date=${dateString}`)
       .then(response => setAppointments(response.data))
       .catch(error => {
         console.error("Erro ao buscar agendamentos:", error);
@@ -65,7 +67,7 @@ export function Dashboard() {
     if (!appointmentToDelete) return;
 
     try {
-      await axios.patch(`http://localhost:3333/appointments/${appointmentToDelete.id}/status`, {
+      await api.patch(`/appointments/${appointmentToDelete.id}/status`, {
         status: 'CANCELED'
       });
 
@@ -111,7 +113,7 @@ export function Dashboard() {
     fetchAppointments();
   }, [selectedDate]);
   useEffect(() => {
-    axios.get(`http://localhost:3333/appointments/upcoming`)
+    api.get(`/appointments/upcoming`)
       .then(response => {
         setUpcomingAppointments(response.data);
       })
