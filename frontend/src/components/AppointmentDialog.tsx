@@ -62,7 +62,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
 
     const dateString = format(selectedDate, 'yyyy-MM-dd');
     
-    api.get('/appointments?date=${dateString}')
+    api.get(`/appointments?date=${dateString}`)
       .then(response => {
         setDailyAppointments(response.data);
       })
