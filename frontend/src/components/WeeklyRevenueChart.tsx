@@ -1,6 +1,6 @@
 // frontend/src/components/WeeklyRevenueChart.tsx
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { Card } from "@/components/ui/card";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -14,7 +14,7 @@ export function WeeklyRevenueChart() {
   const [data, setData] = useState<ChartData[]>([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3333/metrics/revenue-chart')
+    api.get('/metrics/revenue-chart')
       .then(response => setData(response.data))
       .catch(err => console.error("Erro ao buscar dados do gráfico:", err));
   }, []);

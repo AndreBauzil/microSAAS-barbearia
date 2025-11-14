@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 
-import axios from "axios";
+import { api } from "@/lib/api";
 import { format, startOfDay } from "date-fns";
 
 interface InitialData {
@@ -62,7 +62,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
 
     const dateString = format(selectedDate, 'yyyy-MM-dd');
     
-    axios.get(`http://localhost:3333/appointments?date=${dateString}`)
+    api.get('/appointments?date=${dateString}')
       .then(response => {
         setDailyAppointments(response.data);
       })
@@ -97,14 +97,14 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
     try {
       if (isEditMode) {
         // MODO EDIÇÃO: PUT
-        await axios.put(`http://localhost:3333/appointments/${initialData.id}`, appointmentData);
+        await api.put(`/appointments/${initialData.id}`, appointmentData);
         toast({
           title: "Sucesso!",
           description: "O agendamento foi atualizado com sucesso.",
         })
       } else {
         // MODO CRIAÇÃO: POST
-        await axios.post('http://localhost:3333/appointments', appointmentData);
+        await api.post('/appointments', appointmentData);
         toast({
           title: "Sucesso!",
           description: `Agendamento para "${service?.name}" realizado com sucesso.`,
