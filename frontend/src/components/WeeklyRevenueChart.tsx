@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import { Card } from "@/components/ui/card";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { format } from "date-fns"; 
 
 interface ChartData {
   day: string;
@@ -10,14 +11,22 @@ interface ChartData {
   revenue: number;
 }
 
-export function WeeklyRevenueChart() {
+interface WeeklyRevenueChartProps {
+  selectedDate?: Date; 
+}
+
+export function WeeklyRevenueChart({ selectedDate }: WeeklyRevenueChartProps) {
   const [data, setData] = useState<ChartData[]>([]);
 
   useEffect(() => {
-    api.get('/metrics/revenue-chart')
+    const dateParam = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+
+    // Injetando o parâmetro na URL
+    api.get(`/metrics/revenue-chart?date=${dateParam}`)
       .then(response => setData(response.data))
       .catch(err => console.error("Erro ao buscar dados do gráfico:", err));
-  }, []);
+      
+  }, [selectedDate]); 
 
   const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
 

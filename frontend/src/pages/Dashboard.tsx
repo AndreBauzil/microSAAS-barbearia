@@ -170,7 +170,7 @@ export function Dashboard() {
         </div>
 
         <div className="col-span-1 lg:col-span-2 flex flex-col gap-8">
-          <WeeklyRevenueChart />
+          <WeeklyRevenueChart selectedDate={selectedDate} />
 
           <div>
             <h2 className="font-bold mb-4 text-lg">
