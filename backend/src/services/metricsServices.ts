@@ -33,9 +33,8 @@ export class MetricsServices {
     };
   }
 
-  async getRevenueChartData() {
-    const today = new Date();
-    const days = Array.from({ length: 7 }).map((_, i) => subDays(today, i)).reverse();
+  async getRevenueChartData(referenceDate: Date) {
+    const days = Array.from({ length: 7 }).map((_, i) => subDays(referenceDate, i)).reverse();
 
     const chartData = [];
 

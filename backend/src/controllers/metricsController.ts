@@ -19,7 +19,11 @@ export class MetricsController {
 
   async getRevenueChartData(req: Request, res: Response) {
     try {
-      const metrics = await metricsServices.getRevenueChartData();
+      // Eextração da data da URL
+      const { date } = req.query;
+      const referenceDate = date && typeof date === 'string' ? new Date(date) : new Date();
+
+      const metrics = await metricsServices.getRevenueChartData(referenceDate);
       return res.json(metrics);
     } catch (error) {
       return res.status(500).json({ error: 'Something went wrong' });
