@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node-dev prisma/seed.ts"
   },
   "scripts": {
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules --respawn src/server.ts",
     "seed": "ts-node prisma/seed.ts",
-    "build": "prisma migrate deploy && prisma generate && tsc && npm run seed",
+    "build": "prisma generate && prisma migrate deploy && tsc",
     "start": "node dist/server.js"
   },
   "keywords": [],
@@ -17,14 +17,14 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.16.2",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "date-fns": "^4.1.0",
     "express": "^5.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/node": "^24.5.2",
+    "@types/node": "^24.13.1",
     "prisma": "^6.16.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
