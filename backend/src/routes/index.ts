@@ -7,6 +7,7 @@ import { metricsRoutes } from './metricsRoutes';
 
 const routes = Router();
 
+
 routes.use('/services', serviceRoutes);
 routes.use('/appointments', appointmentRoutes);
 routes.use('/metrics', metricsRoutes); 

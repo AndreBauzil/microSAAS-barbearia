@@ -8,6 +8,11 @@ app.use(cors({
     origin: process.env.FRONTEND_URL || '*'
   }));
 app.use(express.json());
+
+app.get('/', (req, res) => {
+    return res.json({ message: "Servidor Barbearia rodando 100% na Vercel! 🚀" });
+  });
+
 app.use(routes); 
 
 const PORT = 3333;
