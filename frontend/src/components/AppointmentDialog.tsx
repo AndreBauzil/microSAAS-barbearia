@@ -34,7 +34,7 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState("");
-  const [_dailyAppointments, setDailyAppointments] = useState<{ date: string }[]>([]);
+  const [_dailyAppointments, setDailyAppointments] = useState<{ id: string; date: string; status: string }[]>([]);
   const [status, setStatus] = useState<'SCHEDULED' | 'COMPLETED' | 'CANCELED'>('SCHEDULED');
 
   const { toast } = useToast()
@@ -121,6 +121,22 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
     }
   }
 
+  const getOccupiedTimes = () => {
+    return _dailyAppointments
+      .filter(app => {
+        if (app.status === 'CANCELED') return false; 
+        
+        if (isEditMode && initialData && app.id === initialData.id) return false; 
+        
+        return true;
+      })
+      .map(app => {
+        return format(new Date(app.date), 'HH:mm'); 
+      });
+  };
+
+  const occupiedTimes = getOccupiedTimes();
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -160,11 +176,21 @@ export function AppointmentDialog({ isOpen, onOpenChange, service, initialData, 
           <div>
               <Label>Horário</Label>
               <div className="grid grid-cols-4 gap-2">
-                  {businessHours.map(time => (
-                      <Button key={time} variant={selectedTime === time ? "default" : "outline"} onClick={() => setSelectedTime(time)}>
-                        {time}
-                      </Button>
-                  ))}
+                {businessHours.map(time => {
+                  const isOccupied = occupiedTimes.includes(time); 
+
+                  return (
+                    <Button 
+                      key={time} 
+                      variant={selectedTime === time ? "default" : "outline"} 
+                      onClick={() => setSelectedTime(time)}
+                      disabled={isOccupied} 
+                      className={isOccupied ? "opacity-50 cursor-not-allowed decoration-line-through" : ""} 
+                    >
+                      {time}
+                    </Button>
+                  )
+                })}
               </div>
           </div>
         </div>

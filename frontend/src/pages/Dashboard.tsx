@@ -44,8 +44,15 @@ export function Dashboard() {
 
   const [upcomingAppointments, setUpcomingAppointments] = useState<IAppointment[]>([]);
 
+  const [revenueTrigger, setRevenueTrigger] = useState(0);
+
   const { toast } = useToast()
 
+  const fetchUpcoming = () => {
+    api.get(`/appointments/upcoming`)
+      .then(response => setUpcomingAppointments(response.data))
+      .catch(error => console.error("Erro ao buscar próximos:", error));
+  };
   const fetchAppointments = () => {
     if (!selectedDate) return;
     setIsLoading(true);
@@ -64,26 +71,13 @@ export function Dashboard() {
   };
   const handleDeleteAppointment = async () => {
     if (!appointmentToDelete) return;
-
     try {
-      await api.patch(`/appointments/${appointmentToDelete.id}/status`, {
-        status: 'CANCELED'
-      });
-
-      setAppointments(prev => prev.map(app => 
-        app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
-      ));
-      setUpcomingAppointments(prev => prev.map(app => 
-        app.id === appointmentToDelete.id ? { ...app, status: 'CANCELED' } : app
-      ));
-
+      await api.patch(`/appointments/${appointmentToDelete.id}/status`, { status: 'CANCELED' });
+      
+      refreshDashboard(); 
+      
     } catch (error) {
-      console.error("Erro ao cancelar agendamento:", error);
-      toast({
-        title: "Erro no Servidor",
-        description: "Houve um erro ao salvar o agendamento. Tente novamente.",
-        variant: "destructive",
-      })
+      toast({ title: "Erro", description: "Falha ao cancelar.", variant: "destructive" });
     } finally {
       setIsAlertDialogOpen(false);
       setAppointmentToDelete(null);
@@ -95,30 +89,26 @@ export function Dashboard() {
   };
   const handleMarkAsCompleted = async (appointmentId: string) => {
     try {
-      setAppointments(prev => prev.map(app => 
-        app.id === appointmentId ? { ...app, status: 'COMPLETED' } : app
-      ));
-      setUpcomingAppointments(prev => prev.map(app => 
-        app.id === appointmentId ? { ...app, status: 'COMPLETED' } : app
-      ));
-
+      await api.patch(`/appointments/${appointmentId}/status`, { status: 'COMPLETED' });
+      
+      refreshDashboard();
+      
+      toast({ title: "Sucesso", description: "Agendamento marcado como concluído." });
     } catch (error) {
-      console.error("Erro ao marcar como concluído:", error);
-      alert("Não foi possível atualizar o agendamento.");
+      toast({ title: "Erro", description: "Não foi possível atualizar.", variant: "destructive" });
     }
-};
+  };
+  const refreshDashboard = () => {
+    fetchAppointments(); 
+    fetchUpcoming();    
+    setRevenueTrigger(prev => prev + 1);
+  };
 
   useEffect(() => {
     fetchAppointments();
   }, [selectedDate]);
   useEffect(() => {
-    api.get(`/appointments/upcoming`)
-      .then(response => {
-        setUpcomingAppointments(response.data);
-      })
-      .catch(error => {
-        console.error("Erro ao buscar próximos agendamentos:", error);
-      });
+    fetchUpcoming();
   }, []);
 
 
@@ -170,7 +160,7 @@ export function Dashboard() {
         </div>
 
         <div className="col-span-1 lg:col-span-2 flex flex-col gap-8">
-          <WeeklyRevenueChart selectedDate={selectedDate} />
+          <WeeklyRevenueChart selectedDate={selectedDate} trigger={revenueTrigger} />
 
           <div>
             <h2 className="font-bold mb-4 text-lg">
@@ -253,12 +243,12 @@ export function Dashboard() {
       <AppointmentDialog 
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
-        service={{ // Obj de serviço
+        service={{ 
           id: appointmentToEdit?.serviceId || '',
           name: appointmentToEdit?.service.name || '',
         }}
         initialData={appointmentToEdit} 
-        onSuccess={fetchAppointments} 
+        onSuccess={refreshDashboard} 
       />
 
       <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
