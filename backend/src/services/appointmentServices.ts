@@ -15,15 +15,34 @@ interface IUpdateAppointmentData {
 }
 
 export class AppointmentServices {
+  private async checkTimeConflict(date: Date, excludeId?: string) {
+    const conflictingAppointment = await prisma.appointment.findFirst({
+        where: {
+            date: date,
+            status: {
+                in: ['SCHEDULED', 'COMPLETED'] 
+            },
+            ...(excludeId ? { id: { not: excludeId } } : {}) 
+        }
+    });
+
+    if (conflictingAppointment) {
+        throw new Error('Já existe um agendamento para este horário.');
+    }
+  }
+
     async create(data: ICreateAppointmentData) {
-        const appointment = await prisma.appointment.create({
-            data: {
-                customerName: data.customerName,
-                date: data.date,
-                serviceId: data.serviceId,
-            }
-        });
-        return appointment;
+      // 1. Adiciona a verificação antes de criar
+      await this.checkTimeConflict(data.date); 
+
+      const appointment = await prisma.appointment.create({
+          data: {
+              customerName: data.customerName,
+              date: data.date,
+              serviceId: data.serviceId,
+          }
+      });
+      return appointment;
     }
 
     async findByDay(dateString: string) {
@@ -54,12 +73,16 @@ export class AppointmentServices {
     }
 
     async update(id: string, data: IUpdateAppointmentData) {
+      if (data.date) {
+          await this.checkTimeConflict(data.date, id);
+      }
+
       const appointment = await prisma.appointment.update({
           where: { id },
           data,
       });
       return appointment;
-  }
+    }
   
     async delete(id: string) {
         await prisma.appointment.delete({
@@ -98,5 +121,5 @@ export class AppointmentServices {
           data: { status },
       });
       return appointment;
-  }
+    }
 }

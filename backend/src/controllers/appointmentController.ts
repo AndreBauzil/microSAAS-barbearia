@@ -22,7 +22,10 @@ export class AppointmentController {
       });
 
       return res.status(201).json(appointment);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === 'Já existe um agendamento para este horário.') {
+        return res.status(409).json({ error: error.message });
+      }
       console.error(error);
       return res.status(500).json({ error: 'Something went wrong' });
     }
@@ -50,14 +53,17 @@ export class AppointmentController {
         const { id } = req.params;
         const { customerName, date, status } = req.body; 
         const appointment = await appointmentServices.update(id, {
-            customerName,
-            date: date ? new Date(date) : undefined,
-            status,
-        });
-        return res.json(appointment);
-    } catch (error) {
-        return res.status(500).json({ error: 'Something went wrong' });
-    }
+          customerName,
+          date: date ? new Date(date) : undefined,
+          status,
+      });
+      return res.json(appointment);
+  } catch (error: any) {
+      if (error.message === 'Já existe um agendamento para este horário.') {
+        return res.status(409).json({ error: error.message });
+      }
+      return res.status(500).json({ error: 'Something went wrong' });
+  }
 }
 
   async delete(req: Request, res: Response) {

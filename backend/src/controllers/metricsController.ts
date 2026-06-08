@@ -19,9 +19,8 @@ export class MetricsController {
 
   async getRevenueChartData(req: Request, res: Response) {
     try {
-      // Eextração da data da URL
       const { date } = req.query;
-      const referenceDate = date && typeof date === 'string' ? new Date(date) : new Date();
+      const referenceDate = date && typeof date === 'string' ? new Date(`${date}T12:00:00`) : new Date();
 
       const metrics = await metricsServices.getRevenueChartData(referenceDate);
       return res.json(metrics);
